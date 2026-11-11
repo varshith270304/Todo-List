@@ -9,7 +9,7 @@ let todos = [];
 let currentFilter = "all";
 
 todoForm.addEventListener("submit", (event) => {
-  // event.preventDefault();
+  event.preventDefault();
   const text = todoInput.value.trim();
 
   if (text) {
