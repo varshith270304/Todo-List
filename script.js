@@ -5,27 +5,11 @@ const emptyMessage = document.getElementById("empty-message");
 const taskCount = document.getElementById("task-count");
 const filterButtons = document.querySelectorAll(".filter");
 
-let todos = [];
+let todos = JSON.parse(localStorage.getItem("todos")) || [];
 let currentFilter = "all";
 
-todoForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const text = todoInput.value.trim();
-
-  if (text) {
-    addTodo(text);
-    todoInput.value = "";
-    todoInput.focus();
-  }
-});
-
-function addTodo(text) {
-  todos.push({
-    id: Date.now(),
-    text: text,
-    completed: false
-  });
-  renderTodos();
+function saveTodos() {
+  localStorage.setItem("todos", JSON.stringify(todos));
 }
 
 function renderTodos() {
@@ -44,7 +28,7 @@ function renderTodos() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = todo.completed;
-    // checkbox.setAttribute("aria-label", "Mark task as completed");
+    checkbox.setAttribute("aria-label", "Mark task as completed");
     checkbox.addEventListener("change", () => toggleTodo(todo.id));
 
     const taskText = document.createElement("span");
@@ -70,20 +54,40 @@ function renderTodos() {
   taskCount.textContent = `${pendingCount} pending / ${todos.length} total`;
 }
 
+function addTodo(text) {
+  todos.push({
+    id: Date.now(),
+    text: text,
+    completed: false
+  });
+  saveTodos();
+  renderTodos();
+}
 
 function toggleTodo(id) {
   todos = todos.map((todo) =>
     todo.id === id ? { ...todo, completed: !todo.completed } : todo
   );
+  saveTodos();
   renderTodos();
 }
 
 function deleteTodo(id) {
   todos = todos.filter((todo) => todo.id !== id);
+  saveTodos();
   renderTodos();
 }
 
+todoForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const text = todoInput.value.trim();
 
+  if (text) {
+    addTodo(text);
+    todoInput.value = "";
+    todoInput.focus();
+  }
+});
 
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
